@@ -21,12 +21,12 @@ import {
 } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCP91hjguLynGQo5b8hB6P2_kv3wq0QurA",
-  authDomain: "job-portal-42631.firebaseapp.com",
-  projectId: "job-portal-42631",
-  storageBucket: "job-portal-42631.firebasestorage.app",
-  messagingSenderId: "644765000096",
-  appId: "1:644765000096:web:48ddfa3b87aa4f604544c5"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 
