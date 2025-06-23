@@ -11,7 +11,7 @@ import {
   Heart,
   Send
 } from 'lucide-react';
-import { getJob, applyForJob } from '../../lib/firebase';
+import { getJob } from '../../lib/firebase';
 import { useJobsStore, useAuthStore } from '../../lib/store';
 import Button from '../../components/ui/Button';
 import { Job } from '../../lib/types';
