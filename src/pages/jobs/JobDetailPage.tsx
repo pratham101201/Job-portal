@@ -15,7 +15,7 @@ import { getJob } from '../../lib/firebase';
 import { useJobsStore, useAuthStore } from '../../lib/store';
 import Button from '../../components/ui/Button';
 import { Job } from '../../lib/types';
-import { formatCurrency, formatDate, capitalizeFirstLetter } from '../../lib/utils';
+import {  formatDate, capitalizeFirstLetter } from '../../lib/utils';
 
 const JobDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -178,7 +178,7 @@ const JobDetailPage: React.FC = () => {
                     <div>
                       <p className="text-xs text-neutral-500">Salary</p>
                       <p className="font-medium">
-                        {formatCurrency(salary)}
+                        {salary}
                       </p>
                     </div>
                   </div>
@@ -250,7 +250,7 @@ const JobDetailPage: React.FC = () => {
                 <div className="flex items-center text-neutral-700">
                   <DollarSign className="w-5 h-5 text-neutral-500 mr-3" />
                   <span>
-                    {formatCurrency(salary)}
+                    {salary}
                   </span>
                 </div>
               )}

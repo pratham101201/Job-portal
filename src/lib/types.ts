@@ -42,7 +42,7 @@ export interface Job {
   description: string;
   requirements: string[];
   location: string;
-  salary?: number;
+  salary?: string;
   jobType: 'full-time' | 'part-time' | 'contract' | 'internship';
   category: string;
   createdAt: number;

@@ -35,7 +35,7 @@ const EmployerPostJob: React.FC = () => {
           category,
           location,
           company,
-          salary: salary ? Number(salary) : undefined,
+          salary: salary || undefined,
           jobType,
         }),
       });
@@ -130,12 +130,18 @@ const EmployerPostJob: React.FC = () => {
             onChange={e => setCompany(e.target.value)}
             required
           />
-          <Input
-            label="Salary"
-            placeholder="e.g. 100000"
-            value={salary}
-            onChange={e => setSalary(e.target.value.replace(/[^0-9]/g, ''))}
-          />
+          <div>
+            <Input
+              label="Salary"
+              type="text"
+              placeholder="e.g., 12LPA/yr or 10-12 LPA"
+              value={salary}
+              onChange={e => setSalary(e.target.value)}
+            />
+            <p className="text-sm text-neutral-500 mt-1">
+              Enter salary in any format (e.g., 12LPA/yr, 10-12 LPA, ₹10 LPA)
+            </p>
+          </div>
 
           {error && <div className="text-red-600">{error}</div>}
           {success && <div className="text-green-600">Job posted successfully!</div>}
