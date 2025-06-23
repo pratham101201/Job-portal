@@ -1,130 +1,124 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase as BriefcaseBusiness, Github, Twitter, Facebook, Instagram } from 'lucide-react';
+import { ShoppingBag, MapPin, Phone, Mail, Clock } from 'lucide-react';
 
-const Footer: React.FC = () => {
+export function Footer() {
   return (
-    <footer className="bg-neutral-800 text-neutral-200">
-      <div className="container py-12">
+    <footer className="bg-gray-900 text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand */}
-          <div className="space-y-4">
-            <Link to="/" className="flex items-center space-x-2">
-              <BriefcaseBusiness className="w-8 h-8 text-primary" />
-              <span className="text-xl font-bold text-white">JobConnect</span>
-            </Link>
-            <p className="text-neutral-400 text-sm">
-              Connecting talented professionals with outstanding employers since 2025.
+          {/* Logo and Description */}
+          <div className="md:col-span-1">
+            <div className="flex items-center space-x-2 mb-4">
+              <ShoppingBag className="w-8 h-8 text-blue-400" />
+              <span className="text-xl font-bold">SuperMall</span>
+            </div>
+            <p className="text-gray-300 text-sm mb-4">
+              Your premier shopping destination with over 200 stores, restaurants, and entertainment options.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Twitter className="w-5 h-5" />
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Facebook className="w-5 h-5" />
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Instagram className="w-5 h-5" />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a href="#" className="text-neutral-400 hover:text-white transition-colors">
-                <Github className="w-5 h-5" />
-                <span className="sr-only">Github</span>
-              </a>
+            <div className="flex items-center space-x-2 text-sm text-gray-300">
+              <MapPin className="w-4 h-4" />
+              <span>123 Mall Street, City Center</span>
             </div>
           </div>
 
-          {/* For Job Seekers */}
-          <div className="space-y-4">
-            <h3 className="text-white font-medium">For Job Seekers</h3>
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/jobs" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Browse Jobs
+                <Link to="/shops" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Browse Shops
                 </Link>
               </li>
               <li>
-                <Link to="/jobseeker/applications" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  My Applications
+                <Link to="/offers" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Current Offers
                 </Link>
               </li>
               <li>
-                <Link to="/jobseeker/profile" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Profile
+                <Link to="/location" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Mall Directory
                 </Link>
               </li>
               <li>
-                <Link to="/resources" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Career Resources
+                <Link to="/events" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Events & News
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* For Employers */}
-          <div className="space-y-4">
-            <h3 className="text-white font-medium">For Employers</h3>
+          {/* Customer Service */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/employer/post-job" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Post a Job
-                </Link>
+                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Help Center
+                </a>
               </li>
               <li>
-                <Link to="/employer/dashboard" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Dashboard
-                </Link>
+                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Contact Us
+                </a>
               </li>
               <li>
-                <Link to="/employer/applications" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Manage Applications
-                </Link>
+                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Lost & Found
+                </a>
               </li>
               <li>
-                <Link to="/pricing" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Pricing
-                </Link>
+                <a href="#" className="text-gray-300 hover:text-blue-400 transition-colors">
+                  Accessibility
+                </a>
               </li>
             </ul>
           </div>
 
-          {/* Company */}
-          <div className="space-y-4">
-            <h3 className="text-white font-medium">Company</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/about" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/privacy" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link to="/terms" className="text-neutral-400 hover:text-white transition-colors text-sm">
-                  Terms of Service
-                </Link>
-              </li>
-            </ul>
+          {/* Contact & Hours */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contact & Hours</h3>
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2 text-sm">
+                <Phone className="w-4 h-4 text-blue-400" />
+                <span className="text-gray-300">+1 (555) 123-MALL</span>
+              </div>
+              <div className="flex items-center space-x-2 text-sm">
+                <Mail className="w-4 h-4 text-blue-400" />
+                <span className="text-gray-300">info@supermall.com</span>
+              </div>
+              <div className="flex items-start space-x-2 text-sm">
+                <Clock className="w-4 h-4 text-blue-400 mt-0.5" />
+                <div className="text-gray-300">
+                  <div>Mon-Thu: 10am-9pm</div>
+                  <div>Fri-Sat: 10am-10pm</div>
+                  <div>Sunday: 11am-8pm</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Bottom section */}
-        <div className="border-t border-neutral-700 mt-8 pt-8 text-center text-sm text-neutral-400">
-          <p>© {new Date().getFullYear()} JobConnect. All rights reserved.</p>
+        <div className="border-t border-gray-800 mt-8 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <p className="text-gray-400 text-sm">
+              © 2024 SuperMall. All rights reserved.
+            </p>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">
+                Terms of Service
+              </a>
+              <a href="#" className="text-gray-400 hover:text-blue-400 text-sm transition-colors">
+                Cookie Policy
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}
