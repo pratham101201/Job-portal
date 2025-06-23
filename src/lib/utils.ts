@@ -14,12 +14,10 @@ export const formatDate = (timestamp: number): string => {
   }).format(date);
 };
 
-export const formatCurrency = (amount: number, currency: string = 'USD'): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    maximumFractionDigits: 0
-  }).format(amount);
+export const formatCurrency = (amount: number): string => {
+  // Format number in Indian style (e.g., 1,20,000)
+  if (typeof amount !== 'number') return '';
+  return '₹' + amount.toLocaleString('en-IN', { maximumFractionDigits: 0 });
 };
 
 export const capitalizeFirstLetter = (string: string): string => {

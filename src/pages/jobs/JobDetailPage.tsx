@@ -1,15 +1,15 @@
-import React, { useEffect, useState ,ChangeEvent} from 'react';
+import React, { useEffect, useState, ChangeEvent } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { 
-  Building2, 
-  MapPin, 
-  Briefcase, 
-  DollarSign, 
-  Clock, 
-  CalendarDays, 
-  Share2, 
+import {
+  Building2,
+  MapPin,
+  Briefcase,
+  DollarSign,
+  Clock,
+  CalendarDays,
+  Share2,
   Heart,
-  Send 
+  Send
 } from 'lucide-react';
 import { getJob, applyForJob } from '../../lib/firebase';
 import { useJobsStore, useAuthStore } from '../../lib/store';
@@ -23,14 +23,14 @@ const JobDetailPage: React.FC = () => {
   const { user } = useAuthStore();
   const [isApplying, setIsApplying] = useState(false);
   const [applicationSuccess, setApplicationSuccess] = useState(false);
-  
+
   const [coverLetter, setCoverLetter] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchJobDetails = async () => {
       if (!id) return;
-      
+
       try {
         setIsLoading(true);
         const jobData = await getJob(id);
@@ -51,52 +51,52 @@ const JobDetailPage: React.FC = () => {
     };
   }, [id, setSelectedJob, setIsLoading, setError]);
 
- 
+
 
   const handleCoverLetterChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setCoverLetter(e.target.value);
   };
 
-const handleApply = async () => {
-  if (!user) {
-    navigate('/login');
-    return;
-  }
-
-  if (!selectedJob) return;
-
-  try {
-    setIsApplying(true);
-
-    // Prepare form data for multipart/form-data
-    const formData = new FormData();
-    formData.append('jobId', selectedJob.id);
-    
-    formData.append('coverLetter', coverLetter); // <-- Add this line
-
-    const token = localStorage.getItem('token');
-    const response = await fetch('https://lucky-determination-production.up.railway.app/api/applications', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token || ''}`,
-        // Do NOT set Content-Type here; browser will set it with boundary
-      },
-      body: formData,
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || 'Failed to submit application');
+  const handleApply = async () => {
+    if (!user) {
+      navigate('/login');
+      return;
     }
 
-    setApplicationSuccess(true);
-  } catch (error) {
-    console.error('Error applying for job:', error);
-    setError('Failed to submit application');
-  } finally {
-    setIsApplying(false);
-  }
-};
+    if (!selectedJob) return;
+
+    try {
+      setIsApplying(true);
+
+      // Prepare form data for multipart/form-data
+      const formData = new FormData();
+      formData.append('jobId', selectedJob.id);
+
+      formData.append('coverLetter', coverLetter); // <-- Add this line
+
+      const token = localStorage.getItem('token');
+      const response = await fetch('https://lucky-determination-production.up.railway.app/api/applications', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token || ''}`,
+          // Do NOT set Content-Type here; browser will set it with boundary
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.message || 'Failed to submit application');
+      }
+
+      setApplicationSuccess(true);
+    } catch (error) {
+      console.error('Error applying for job:', error);
+      setError('Failed to submit application');
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   if (!selectedJob) {
     return (
@@ -108,14 +108,14 @@ const handleApply = async () => {
     );
   }
 
-  const { 
-    title, 
-    company, 
-    location, 
-    description, 
-    requirements, 
-    jobType, 
-    salary, 
+  const {
+    title,
+    company,
+    location,
+    description,
+    requirements,
+    jobType,
+    salary,
     createdAt,
     applications
   } = selectedJob;
@@ -140,7 +140,7 @@ const handleApply = async () => {
                     <span className="font-medium">{company}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-3">
                   <button className="btn btn-ghost text-neutral-600">
                     <Share2 className="w-4 h-4 mr-2" />
@@ -152,7 +152,7 @@ const handleApply = async () => {
                   </button>
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
                 <div className="flex items-center p-3 bg-neutral-50 rounded-md">
                   <MapPin className="w-5 h-5 text-primary mr-3" />
@@ -161,29 +161,29 @@ const handleApply = async () => {
                     <p className="font-medium">{location}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center p-3 bg-neutral-50 rounded-md">
                   <Briefcase className="w-5 h-5 text-secondary mr-3" />
                   <div>
                     <p className="text-xs text-neutral-500">Job Type</p>
                     <p className="font-medium">{jobType
-    ? capitalizeFirstLetter(jobType.replace('-', ' '))
-    : 'N/A'}</p>
+                      ? capitalizeFirstLetter(jobType.replace('-', ' '))
+                      : 'N/A'}</p>
                   </div>
                 </div>
-                
+
                 {salary && (
                   <div className="flex items-center p-3 bg-neutral-50 rounded-md">
                     <DollarSign className="w-5 h-5 text-accent mr-3" />
                     <div>
-                      <p className="text-xs text-neutral-500">Salary Range</p>
+                      <p className="text-xs text-neutral-500">Salary</p>
                       <p className="font-medium">
-                        {formatCurrency(salary.min, salary.currency)} - {formatCurrency(salary.max, salary.currency)}
+                        {formatCurrency(salary)}
                       </p>
                     </div>
                   </div>
                 )}
-                
+
                 <div className="flex items-center p-3 bg-neutral-50 rounded-md">
                   <CalendarDays className="w-5 h-5 text-success mr-3" />
                   <div>
@@ -193,31 +193,31 @@ const handleApply = async () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="border-t border-neutral-200 pt-6">
               <h2 className="text-xl font-semibold mb-4">Job Description</h2>
               <div className="text-neutral-700 space-y-4">
                 <p>{description}</p>
               </div>
             </div>
-            
+
             <div className="border-t border-neutral-200 pt-6 mt-6">
               <h2 className="text-xl font-semibold mb-4">Requirements</h2>
               <ul className="list-disc pl-5 space-y-2 text-neutral-700">
-  {(requirements || []).map((requirement, index) => (
-    <li key={index}>{requirement}</li>
-  ))}
-</ul>
+                {(requirements || []).map((requirement, index) => (
+                  <li key={index}>{requirement}</li>
+                ))}
+              </ul>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow-md border border-neutral-200 p-6">
             <h2 className="text-xl font-semibold mb-4">About {company}</h2>
             <p className="text-neutral-700 mb-4">
-              This is a placeholder for company information. In a real application, 
+              This is a placeholder for company information. In a real application,
               this would show details about the company, their mission, culture, and benefits.
             </p>
-            
+
             <div className="flex items-center mt-6">
               <Link to={`/company/${company.toLowerCase().replace(/\s+/g, '-')}`} className="text-primary font-medium">
                 View Company Profile
@@ -225,12 +225,12 @@ const handleApply = async () => {
             </div>
           </div>
         </div>
-        
+
         {/* Application Sidebar */}
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md border border-neutral-200 p-6 sticky top-24">
             <h2 className="text-xl font-semibold mb-4">Job Summary</h2>
-            
+
             <div className="space-y-4 mb-6">
               <div className="flex items-center text-neutral-700">
                 <Building2 className="w-5 h-5 text-neutral-500 mr-3" />
@@ -243,14 +243,14 @@ const handleApply = async () => {
               <div className="flex items-center text-neutral-700">
                 <Briefcase className="w-5 h-5 text-neutral-500 mr-3" />
                 <span> {jobType
-    ? capitalizeFirstLetter(jobType.replace('-', ' '))
-    : 'N/A'}</span>
+                  ? capitalizeFirstLetter(jobType.replace('-', ' '))
+                  : 'N/A'}</span>
               </div>
               {salary && (
                 <div className="flex items-center text-neutral-700">
                   <DollarSign className="w-5 h-5 text-neutral-500 mr-3" />
                   <span>
-                    {formatCurrency(salary.min, salary.currency)} - {formatCurrency(salary.max, salary.currency)}
+                    {formatCurrency(salary)}
                   </span>
                 </div>
               )}
@@ -263,7 +263,7 @@ const handleApply = async () => {
                 <span>{applications.length} application(s)</span>
               </div>
             </div>
-            
+
             {/* Application Actions */}
             <div className="space-y-3">
               {isJobSeeker && (
@@ -281,7 +281,7 @@ const handleApply = async () => {
                         handleApply();
                       }}
                     >
-                      
+
                       <div>
                         <label className="block text-sm font-medium mb-1">Cover Letter</label>
                         <textarea
@@ -303,25 +303,25 @@ const handleApply = async () => {
                   )}
                 </>
               )}
-              
+
               {isEmployer && selectedJob.employerId === user?.id && (
-                <Button 
+                <Button
                   className="w-full"
                   onClick={() => navigate('/employer/applications')}
                 >
                   View Applications
                 </Button>
               )}
-              
+
               {isAdmin && (
                 <div className="space-y-3">
-                  <Button 
+                  <Button
                     className="w-full"
                     onClick={() => navigate('/admin/jobs')}
                   >
                     Manage Job
                   </Button>
-                  <Button 
+                  <Button
                     variant="outline"
                     className="w-full"
                     onClick={() => navigate('/admin/users')}
@@ -330,10 +330,10 @@ const handleApply = async () => {
                   </Button>
                 </div>
               )}
-              
+
               {!user && (
                 <div className="space-y-3">
-                  <Button 
+                  <Button
                     className="w-full"
                     onClick={() => navigate('/login?redirect=' + encodeURIComponent(window.location.pathname))}
                   >

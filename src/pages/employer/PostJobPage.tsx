@@ -35,7 +35,7 @@ const EmployerPostJob: React.FC = () => {
           category,
           location,
           company,
-          salary,
+          salary: salary ? Number(salary) : undefined,
           jobType,
         }),
       });
@@ -84,37 +84,37 @@ const EmployerPostJob: React.FC = () => {
               required
             />
           </div>
-           <div>
+          <div>
             <label className="text-sm font-medium text-neutral-700 mb-2 block">
               Category
             </label>
             <select
-  className="input w-full"
-  value={category}
-  onChange={e => setCategory(e.target.value)}
-  required
->
-  <option value="">Select Category</option>
-  {jobCategories.map((cat) => (
-    <option key={cat.value} value={cat.value}>{cat.label}</option>
-  ))}
-</select>
+              className="input w-full"
+              value={category}
+              onChange={e => setCategory(e.target.value)}
+              required
+            >
+              <option value="">Select Category</option>
+              {jobCategories.map((cat) => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="text-sm font-medium text-neutral-700 mb-2 block">
               Type of Job
             </label>
-           <select
-  className="input w-full"
-  value={jobType}
-  onChange={e => setJobType(e.target.value)}
-  required
->
-  <option value="">Select Job Type</option>
-  {jobTypes.map((type) => (
-    <option key={type.value} value={type.value}>{type.label}</option>
-  ))}
-</select>
+            <select
+              className="input w-full"
+              value={jobType}
+              onChange={e => setJobType(e.target.value)}
+              required
+            >
+              <option value="">Select Job Type</option>
+              {jobTypes.map((type) => (
+                <option key={type.value} value={type.value}>{type.label}</option>
+              ))}
+            </select>
           </div>
           <Input
             label="Location"
@@ -132,9 +132,9 @@ const EmployerPostJob: React.FC = () => {
           />
           <Input
             label="Salary"
-            placeholder="e.g. $100,000 - $120,000"
+            placeholder="e.g. 100000"
             value={salary}
-            onChange={e => setSalary(e.target.value)}
+            onChange={e => setSalary(e.target.value.replace(/[^0-9]/g, ''))}
           />
 
           {error && <div className="text-red-600">{error}</div>}

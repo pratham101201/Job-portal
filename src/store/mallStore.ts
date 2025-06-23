@@ -32,26 +32,26 @@ export const useMallStore = create<MallState>((set, get) => ({
   filters: {},
 
   setSearchQuery: (query) => set({ searchQuery: query }),
-  
+
   setFilters: (filters) => set({ filters }),
 
   getShopById: (id) => get().shops.find(shop => shop.id === id),
-  
+
   getProductById: (id) => get().products.find(product => product.id === id),
-  
+
   getOfferById: (id) => get().offers.find(offer => offer.id === id),
 
-  getShopsByCategory: (category) => 
+  getShopsByCategory: (category) =>
     get().shops.filter(shop => shop.category === category),
 
-  getProductsByShop: (shopId) => 
+  getProductsByShop: (shopId) =>
     get().products.filter(product => product.shopId === shopId),
 
   getActiveOffers: () => {
     const now = new Date();
-    return get().offers.filter(offer => 
-      offer.isActive && 
-      offer.validFrom <= now && 
+    return get().offers.filter(offer =>
+      offer.isActive &&
+      offer.validFrom <= now &&
       offer.validTo >= now
     );
   },
@@ -75,8 +75,8 @@ export const useMallStore = create<MallState>((set, get) => ({
     }
 
     if (filters.priceRange) {
-      filtered = filtered.filter(product => 
-        product.price >= filters.priceRange!.min && 
+      filtered = filtered.filter(product =>
+        product.price >= filters.priceRange!.min &&
         product.price <= filters.priceRange!.max
       );
     }

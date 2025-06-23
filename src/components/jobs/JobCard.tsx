@@ -43,28 +43,28 @@ const JobCard: React.FC<JobCardProps> = ({ job, featured = false }) => {
               <div className="flex items-center">
                 <DollarSign className="w-4 h-4 mr-1" />
                 <span>
-                  {formatCurrency(job.salary.min, job.salary.currency)} - {formatCurrency(job.salary.max, job.salary.currency)}
+                  {formatCurrency(job.salary)}
                 </span>
               </div>
             )}
           </div>
-          
+
           <p className="text-neutral-600 line-clamp-2">
             {job.description}
           </p>
-          
-                <div className="flex flex-wrap gap-2">
-          {(job.requirements || []).slice(0, 3).map((requirement, index) => (
-            <span key={index} className="bg-neutral-100 text-neutral-600 text-xs px-2 py-1 rounded-full">
-              {requirement}
-            </span>
-          ))}
-          {(job.requirements && job.requirements.length > 3) && (
-            <span className="bg-neutral-100 text-neutral-600 text-xs px-2 py-1 rounded-full">
-              +{job.requirements.length - 3} more
-            </span>
-          )}
-        </div>
+
+          <div className="flex flex-wrap gap-2">
+            {(job.requirements || []).slice(0, 3).map((requirement, index) => (
+              <span key={index} className="bg-neutral-100 text-neutral-600 text-xs px-2 py-1 rounded-full">
+                {requirement}
+              </span>
+            ))}
+            {(job.requirements && job.requirements.length > 3) && (
+              <span className="bg-neutral-100 text-neutral-600 text-xs px-2 py-1 rounded-full">
+                +{job.requirements.length - 3} more
+              </span>
+            )}
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between items-center">
@@ -72,7 +72,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, featured = false }) => {
           <Clock className="w-3 h-3 mr-1" />
           <span>{getRelativeTimeString(job.createdAt)}</span>
         </div>
-        <Link 
+        <Link
           to={`/jobs/${job.id}`}
           className="text-sm font-medium text-primary hover:text-primary-dark transition-colors"
         >
