@@ -1,255 +1,243 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ShoppingBag, MapPin, Tag, Users, Sparkles, Clock } from 'lucide-react';
-import { useMallStore } from '../store/mallStore';
+import { Briefcase, User, Building2, PanelRight } from 'lucide-react';
+import Button from '../components/ui/Button';
+import { useJobsStore } from '../lib/store';
+import JobCard from '../components/jobs/JobCard';
+import JobSearch, { JobSearchFilters } from '../components/jobs/JobSearch';
+import { useAuthStore } from '../lib/store';
 
-export function HomePage() {
-  const { shops, getActiveOffers } = useMallStore();
-  const activeOffers = getActiveOffers();
-  const featuredShops = shops.slice(0, 3);
+const HomePage: React.FC = () => {
+  const { featuredJobs, setFeaturedJobs, setIsLoading, setError } = useJobsStore();
+  const [stats] = useState({
+    jobs: 1500,
+    companies: 500,
+    candidates: 5000
+  });
+  const user = useAuthStore((state) => state.user);
+  const role = user?.role;
+
+  useEffect(() => {
+    const fetchFeaturedJobs = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('https://lucky-determination-production.up.railway.app/api/jobs');
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch jobs');
+        }
+
+        const jobs = await response.json();
+        setFeaturedJobs(jobs);
+      } catch (error) {
+        console.error('Error fetching featured jobs:', error);
+        setError('Failed to load featured jobs');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFeaturedJobs();
+  }, [setFeaturedJobs, setIsLoading, setError]);
+
+  const handleSearch = (filters: JobSearchFilters) => {
+    // Build the query string with all possible filters
+    const queryParams = new URLSearchParams();
+    if (filters.keyword) queryParams.append('keyword', filters.keyword);
+    if (filters.location) queryParams.append('location', filters.location);
+    if (filters.category) queryParams.append('category', filters.category);
+
+    // Navigate to the jobs page with the search filters
+    window.location.href = `/jobs?${queryParams.toString()}`;
+  };
 
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-blue-600 to-purple-700 text-white">
-        <div className="absolute inset-0 bg-black opacity-20"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Welcome to <span className="text-yellow-300">SuperMall</span>
+      <section className="bg-gradient-to-r from-primary-dark via-primary to-primary-light text-white py-20">
+        <div className="container">
+          <div className="max-w-3xl mx-auto text-center space-y-6">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight animate-fade-in">
+              Find Your Dream Job Today
             </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-              Discover amazing shops, exclusive offers, and unforgettable experiences 
-              all under one roof
+            <p className="text-lg md:text-xl text-white/90 animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              Connect with top employers and discover opportunities that match your skills and aspirations.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/shops"
-                className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center justify-center"
-              >
-                Browse Shops
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Link>
-              <Link
-                to="/offers"
-                className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors flex items-center justify-center"
-              >
-                View Offers
-                <Tag className="ml-2 w-5 h-5" />
-              </Link>
+            <div className="bg-white rounded-lg p-4 shadow-lg animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <JobSearch onSearch={handleSearch} />
+            </div>
+            <div className="flex flex-wrap justify-center gap-6 pt-4 animate-fade-in" style={{ animationDelay: '0.6s' }}>
+              <div className="flex items-center space-x-2">
+                <Briefcase className="w-5 h-5" />
+                <span>{stats.jobs.toLocaleString()}+ Jobs</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Building2 className="w-5 h-5" />
+                <span>{stats.companies.toLocaleString()}+ Companies</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <User className="w-5 h-5" />
+                <span>{stats.candidates.toLocaleString()}+ Candidates</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose SuperMall?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Experience shopping like never before with our world-class facilities and services
+      {/* Featured Jobs Section */}
+      <section className="py-16 bg-neutral-50">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-neutral-800 mb-3">Featured Jobs</h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto">
+              Explore our handpicked selection of top opportunities from leading companies
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ShoppingBag className="w-8 h-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">200+ Premium Shops</h3>
-              <p className="text-gray-600">
-                From luxury brands to local favorites, discover an incredible variety of shops and boutiques
-              </p>
+          {featuredJobs.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredJobs.map((job) => (
+                <JobCard key={job.id} job={job} featured={true} />
+              ))}
             </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-neutral-500">Loading featured jobs...</p>
+            </div>
+          )}
 
-            <div className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MapPin className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Easy Navigation</h3>
-              <p className="text-gray-600">
-                Interactive mall map and digital directory to help you find exactly what you're looking for
-              </p>
-            </div>
-
-            <div className="text-center p-6 rounded-lg hover:shadow-lg transition-shadow">
-              <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Sparkles className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Exclusive Offers</h3>
-              <p className="text-gray-600">
-                Get access to special discounts, seasonal sales, and member-only promotions
-              </p>
-            </div>
+          <div className="text-center mt-12">
+            <Link to="/jobs">
+              <Button size="lg" className="px-8">
+                View All Jobs
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Shops */}
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Featured Shops
-            </h2>
-            <p className="text-xl text-gray-600">
-              Discover our most popular and highly-rated stores
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredShops.map((shop) => (
-              <div key={shop.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                <img
-                  src={shop.images[0]}
-                  alt={shop.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-xl font-semibold text-gray-900">{shop.name}</h3>
-                    <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
-                      {shop.category}
-                    </span>
+      {/* How It Works & CTA Sections: Only show if NOT logged in */}
+      {!role && (
+        <>
+          {/* How It Works Section */}
+          <section className="py-16 bg-white">
+            <div className="container">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-neutral-800 mb-3">How It Works</h2>
+                <p className="text-neutral-600 max-w-2xl mx-auto">
+                  Our platform makes it easy to find the perfect job or the ideal candidate
+                </p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Job Seekers */}
+                <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Briefcase className="h-6 w-6" />
                   </div>
-                  <p className="text-gray-600 mb-4 line-clamp-2">{shop.description}</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-1">
-                      <span className="text-yellow-400">★</span>
-                      <span className="text-sm text-gray-600">
-                        {shop.rating} ({shop.reviewCount} reviews)
-                      </span>
-                    </div>
-                    <Link
-                      to={`/shops/${shop.id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
-                    >
-                      Visit Shop →
+                  <h3 className="text-xl font-semibold mb-3">For Job Seekers</h3>
+                  <ul className="space-y-3 text-neutral-600 text-left">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-primary">1.</span>
+                      <span>Create your profile and upload your resume</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-primary">2.</span>
+                      <span>Search and filter jobs that match your skills</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-primary">3.</span>
+                      <span>Apply with one click and track your applications</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    <Link to="/jobs">
+                      <Button variant="outline" className="w-full">Find Jobs</Button>
+                    </Link>
+                  </div>
+                </div>
+                {/* Employers */}
+                <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-secondary/10 text-secondary">
+                    <Building2 className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">For Employers</h3>
+                  <ul className="space-y-3 text-neutral-600 text-left">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-secondary">1.</span>
+                      <span>Create your company profile with all details</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-secondary">2.</span>
+                      <span>Post detailed job listings with requirements</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-secondary">3.</span>
+                      <span>Review applications and contact candidates</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    <Link to="/jobs/new">
+                      <Button variant="outline" className="w-full">Post a Job</Button>
+                    </Link>
+                  </div>
+                </div>
+                {/* Administrators */}
+                <div className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:shadow-md text-center">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-accent/10 text-accent">
+                    <PanelRight className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-3">For Administrators</h3>
+                  <ul className="space-y-3 text-neutral-600 text-left">
+                    <li className="flex items-start">
+                      <span className="mr-2 text-accent">1.</span>
+                      <span>Manage all users, jobs, and applications</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-accent">2.</span>
+                      <span>Monitor platform activity and performance</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="mr-2 text-accent">3.</span>
+                      <span>Ensure compliance and maintain quality standards</span>
+                    </li>
+                  </ul>
+                  <div className="mt-6">
+                    <Link to="/admin">
+                      <Button variant="outline" className="w-full">Go to Admin Panel</Button>
                     </Link>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          </section>
 
-          <div className="text-center mt-12">
-            <Link
-              to="/shops"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors inline-flex items-center"
-            >
-              View All Shops
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Current Offers */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Current Offers
-            </h2>
-            <p className="text-xl text-gray-600">
-              Don't miss out on these amazing deals
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {activeOffers.slice(0, 2).map((offer) => (
-              <div key={offer.id} className="bg-gradient-to-r from-red-500 to-pink-600 rounded-lg overflow-hidden text-white">
-                <div className="p-6">
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Tag className="w-5 h-5" />
-                    <span className="text-sm font-medium uppercase tracking-wide">
-                      {offer.type === 'discount' ? 'DISCOUNT' : 'SPECIAL OFFER'}
-                    </span>
-                  </div>
-                  <h3 className="text-2xl font-bold mb-2">{offer.title}</h3>
-                  <p className="mb-4 opacity-90">{offer.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm opacity-75">
-                      Valid until {offer.validTo.toLocaleDateString()}
-                    </span>
-                    <Link
-                      to={`/shops/${offer.shopId}`}
-                      className="bg-white text-red-600 px-4 py-2 rounded font-medium hover:bg-gray-100 transition-colors"
-                    >
-                      Shop Now
-                    </Link>
-                  </div>
+          {/* CTA Section */}
+          <section className="py-16 bg-secondary text-white">
+            <div className="container">
+              <div className="max-w-3xl mx-auto text-center space-y-6">
+                <h2 className="text-3xl font-bold">Ready to Take the Next Step?</h2>
+                <p className="text-white/90 text-lg">
+                  Join thousands of professionals and hundreds of companies already using our platform.
+                </p>
+                <div className="flex flex-wrap justify-center gap-4">
+                  <Link to="/register">
+                    <Button size="lg" className="bg-white text-secondary hover:bg-neutral-100">
+                      Sign Up Now
+                    </Button>
+                  </Link>
+                  <Link to="/jobs">
+                    <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                      Browse Jobs
+                    </Button>
+                  </Link>
                 </div>
               </div>
-            ))}
-          </div>
-
-          <div className="text-center mt-12">
-            <Link
-              to="/offers"
-              className="bg-red-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors inline-flex items-center"
-            >
-              View All Offers
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Statistics */}
-      <section className="py-20 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold text-blue-400 mb-2">200+</div>
-              <div className="text-gray-300">Shops & Restaurants</div>
             </div>
-            <div>
-              <div className="text-4xl font-bold text-purple-400 mb-2">5M+</div>
-              <div className="text-gray-300">Annual Visitors</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-green-400 mb-2">3</div>
-              <div className="text-gray-300">Floors of Shopping</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold text-yellow-400 mb-2">1000+</div>
-              <div className="text-gray-300">Parking Spaces</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Start Shopping?
-          </h2>
-          <p className="text-xl mb-8">
-            Join thousands of satisfied customers and discover your new favorite store today
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/register"
-              className="bg-white text-purple-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center"
-            >
-              <Users className="mr-2 w-5 h-5" />
-              Join SuperMall
-            </Link>
-            <Link
-              to="/location"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-purple-600 transition-colors inline-flex items-center justify-center"
-            >
-              <MapPin className="mr-2 w-5 h-5" />
-              Find Us
-            </Link>
-          </div>
-        </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
-}
+};
+
+export default HomePage;

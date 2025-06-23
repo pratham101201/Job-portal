@@ -1,23 +1,24 @@
 import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  createUserWithEmailAndPassword, 
-  signInWithEmailAndPassword, 
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut as firebaseSignOut,
   updateProfile,
   onAuthStateChanged
 } from 'firebase/auth';
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
-  setDoc, 
-  getDoc, 
-  updateDoc, 
-  query, 
-  where, 
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  query,
+  where,
   getDocs,
-  orderBy
+  orderBy,
+  limit as limitQuery
 } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -40,7 +41,7 @@ export const registerUser = async (email: string, password: string, displayName:
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(userCredential.user, { displayName });
-    
+
     // Create user document in Firestore
     await setDoc(doc(db, 'users', userCredential.user.uid), {
       email,
@@ -48,13 +49,13 @@ export const registerUser = async (email: string, password: string, displayName:
       role,
       createdAt: Date.now(),
       // Add role-specific fields
-      ...(role === 'jobseeker' && { 
-        skills: [], 
-        experience: 0, 
+      ...(role === 'jobseeker' && {
+        skills: [],
+        experience: 0,
         education: [],
         appliedJobs: []
       }),
-      ...(role === 'employer' && { 
+      ...(role === 'employer' && {
         companyName: '',
         companyDescription: '',
         industry: '',
@@ -62,7 +63,7 @@ export const registerUser = async (email: string, password: string, displayName:
         postedJobs: []
       })
     });
-    
+
     return userCredential.user;
   } catch (error) {
     throw error;
@@ -109,7 +110,7 @@ export const createJob = async (jobData: any) => {
     const jobsCollection = collection(db, 'jobs');
     const newJobRef = doc(jobsCollection);
     const jobId = newJobRef.id;
-    
+
     await setDoc(newJobRef, {
       ...jobData,
       id: jobId,
@@ -118,18 +119,18 @@ export const createJob = async (jobData: any) => {
       isActive: true,
       applications: []
     });
-    
+
     // Update employer's postedJobs array
     const employerRef = doc(db, 'users', jobData.employerId);
     const employerDoc = await getDoc(employerRef);
-    
+
     if (employerDoc.exists()) {
       const employerData = employerDoc.data();
       await updateDoc(employerRef, {
         postedJobs: [...(employerData.postedJobs || []), jobId]
       });
     }
-    
+
     return jobId;
   } catch (error) {
     throw error;
@@ -140,24 +141,24 @@ export const getJobs = async (filters: { category?: string; location?: string } 
   try {
     const jobsCollection = collection(db, 'jobs');
     let jobQuery = query(jobsCollection, where('isActive', '==', true), orderBy('createdAt', 'desc'));
-    
+
     // Apply filters if provided
     // This is a simplified example - you'd add more complex filtering logic here
     if (filters.category) {
       jobQuery = query(jobQuery, where('category', '==', filters.category));
     }
-    
+
     if (filters.location) {
       jobQuery = query(jobQuery, where('location', '==', filters.location));
     }
-    
+
     const querySnapshot = await getDocs(jobQuery);
     const jobs: any[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       jobs.push({ id: doc.id, ...doc.data() });
     });
-    
+
     return jobs;
   } catch (error) {
     throw error;
@@ -184,7 +185,7 @@ export const applyForJob = async (applicationData: any) => {
     const applicationsCollection = collection(db, 'applications');
     const newApplicationRef = doc(applicationsCollection);
     const applicationId = newApplicationRef.id;
-    
+
     await setDoc(newApplicationRef, {
       ...applicationData,
       id: applicationId,
@@ -192,29 +193,29 @@ export const applyForJob = async (applicationData: any) => {
       appliedAt: Date.now(),
       updatedAt: Date.now()
     });
-    
+
     // Update job's applications array
     const jobRef = doc(db, 'jobs', applicationData.jobId);
     const jobDoc = await getDoc(jobRef);
-    
+
     if (jobDoc.exists()) {
       const jobData = jobDoc.data();
       await updateDoc(jobRef, {
         applications: [...(jobData.applications || []), applicationId]
       });
     }
-    
+
     // Update user's appliedJobs array
     const userRef = doc(db, 'users', applicationData.userId);
     const userDoc = await getDoc(userRef);
-    
+
     if (userDoc.exists()) {
       const userData = userDoc.data();
       await updateDoc(userRef, {
         appliedJobs: [...(userData.appliedJobs || []), applicationData.jobId]
       });
     }
-    
+
     return applicationId;
   } catch (error) {
     throw error;
@@ -225,26 +226,26 @@ export const getApplications = async (userId: string, type: 'user' | 'job', stat
   try {
     const applicationsCollection = collection(db, 'applications');
     let applicationQuery;
-    
+
     if (type === 'user') {
       applicationQuery = query(applicationsCollection, where('userId', '==', userId));
     } else {
       applicationQuery = query(applicationsCollection, where('jobId', '==', userId));
     }
-    
+
     if (status) {
       applicationQuery = query(applicationQuery, where('status', '==', status));
     }
-    
+
     applicationQuery = query(applicationQuery, orderBy('appliedAt', 'desc'));
-    
+
     const querySnapshot = await getDocs(applicationQuery);
     const applications: any[] = [];
-    
+
     querySnapshot.forEach((doc) => {
       applications.push({ id: doc.id, ...doc.data() });
     });
-    
+
     return applications;
   } catch (error) {
     throw error;
@@ -265,28 +266,28 @@ export const updateApplicationStatus = async (applicationId: string, newStatus: 
 };
 
 // Admin functions
-export const getAllUsers = async (role?: string, limit?: number) => {
+export const getAllUsers = async (role?: string, limitCount?: number) => {
   try {
     const usersCollection = collection(db, 'users');
     let userQuery;
-    
+
     if (role) {
       userQuery = query(usersCollection, where('role', '==', role));
     } else {
       userQuery = query(usersCollection);
     }
-    
-    if (limit) {
-      userQuery = query(userQuery, limit(limit));
+
+    if (limitCount) {
+      userQuery = query(userQuery, limitQuery(limitCount));
     }
-    
+
     const querySnapshot = await getDocs(userQuery);
-    const users :any []= [];
-    
+    const users: any[] = [];
+
     querySnapshot.forEach((doc) => {
       users.push({ id: doc.id, ...doc.data() });
     });
-    
+
     return users;
   } catch (error) {
     throw error;

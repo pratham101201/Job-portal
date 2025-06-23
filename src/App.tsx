@@ -1,65 +1,180 @@
-import { Routes, Route } from 'react-router-dom';
-import { Navbar } from './components/layout/Navbar';
-import { Footer } from './components/layout/Footer';
-import { HomePage } from './pages/HomePage';
-import { LoginPage } from './pages/auth/LoginPage';
-import { RegisterPage } from './pages/auth/RegisterPage';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './lib/store';
 
-// Jobs
+// Layout
+import Layout from './components/layout/Layout';
+
+// Public pages
+import HomePage from './pages/HomePage';
+import  LoginPage  from './pages/auth/LoginPage';
+import RegisterPage  from './pages/auth/RegisterPage';
 import JobsPage from './pages/jobs/JobsPage';
 import JobDetailPage from './pages/jobs/JobDetailPage';
 
-// Employer
+// Job seeker pages
+import JobSeekerProfile from './pages/jobseeker/ProfilePage';
+import JobSeekerApplications from './pages/jobseeker/ApplicationsPage';
+
+// Employer pages
 import EmployerDashboard from './pages/employer/DashboardPage';
 import EmployerPostJob from './pages/employer/PostJobPage';
 import EmployerApplications from './pages/employer/ApplicationsPage';
 import EmployerProfile from './pages/employer/ProfilePage';
 import EmployerLayout from './pages/employer/EmployerLayout';
 
-// Admin
+// Admin pages
 import AdminDashboard from './pages/admin/DashboardPage';
+import AdminUsers from './pages/admin/UsersPage';
 import AdminJobs from './pages/admin/JobsPage';
-import UsersPage from './pages/admin/UsersPage';
 import AdminLayout from './pages/admin/AdminLayout';
 
-// Jobseeker
-import JobSeekerApplications from './pages/jobseeker/ApplicationsPage';
-import JobSeekerProfile from './pages/jobseeker/ProfilePage';
+// Auth route components
+const ProtectedRoute: React.FC<{
+    children: React.ReactNode;
+    allowedRoles?: string[];
+}> = ({ children, allowedRoles = [] }) => {
+    const { user, isLoading } = useAuthStore();
+
+    if (isLoading) {
+        return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    }
+
+    if (!user) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+        return <Navigate to="/" replace />;
+    }
+
+    return <>{children}</>;
+};
 
 function App() {
+    const { initializeAuthListener } = useAuthStore();
+
+    useEffect(() => {
+        const unsubscribe = initializeAuthListener();
+        return () => {
+            if (typeof unsubscribe === 'function') {
+                unsubscribe();
+            }
+        };
+    }, [initializeAuthListener]);
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-            <Navbar />
-            <main className="flex-1">
-                <Routes>
-                    {/* Public */}
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/jobs" element={<JobsPage />} />
-                    <Route path="/jobs/:id" element={<JobDetailPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
+        <Routes>
+            <Route path="/" element={<Layout><HomePage /></Layout>} />
+            <Route path="/login" element={<Layout><LoginPage /></Layout>} />
+            <Route path="/register" element={<Layout><RegisterPage /></Layout>} />
+            <Route path="/jobs" element={<Layout><JobsPage /></Layout>} />
+            <Route path="/jobs/:id" element={<Layout><JobDetailPage /></Layout>} />
 
-                    {/* Employer */}
-                    <Route path="/employer" element={<EmployerLayout><EmployerDashboard /></EmployerLayout>} />
-                    <Route path="/employer/dashboard" element={<EmployerLayout><EmployerDashboard /></EmployerLayout>} />
-                    <Route path="/employer/applications" element={<EmployerLayout><EmployerApplications /></EmployerLayout>} />
-                    <Route path="/employer/post-job" element={<EmployerLayout><EmployerPostJob /></EmployerLayout>} />
-                    <Route path="/employer/profile" element={<EmployerLayout><EmployerProfile /></EmployerLayout>} />
+            {/* Job seeker routes */}
+            <Route
+                path="/jobseeker/profile"
+                element={
+                    <Layout>
+                        <ProtectedRoute allowedRoles={['jobseeker']}>
+                            <JobSeekerProfile />
+                        </ProtectedRoute>
+                    </Layout>
+                }
+            />
+            <Route
+                path="/jobseeker/applications"
+                element={
+                    <Layout>
+                        <ProtectedRoute allowedRoles={['jobseeker']}>
+                            <JobSeekerApplications />
+                        </ProtectedRoute>
+                    </Layout>
+                }
+            />
 
-                    {/* Admin */}
-                    <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-                    <Route path="/admin/dashboard" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-                    <Route path="/admin/jobs" element={<AdminLayout><AdminJobs /></AdminLayout>} />
-                    <Route path="/admin/users" element={<AdminLayout><UsersPage /></AdminLayout>} />
+            {/* Employer routes */}
+            <Route
+                path="/employer/dashboard"
+                element={
+                    <Layout>
+                        <EmployerLayout><ProtectedRoute allowedRoles={['employer']}>
+                            <EmployerDashboard />
+                            <EmployerPostJob />
 
-                    {/* Jobseeker */}
-                    <Route path="/jobseeker/applications" element={<JobSeekerApplications />} />
-                    <Route path="/jobseeker/profile" element={<JobSeekerProfile />} />
-                </Routes>
-            </main>
-            <Footer />
-        </div>
+                        </ProtectedRoute></EmployerLayout>
+
+                    </Layout>
+                }
+            />
+            <Route
+                path="/employer/post-job"
+                element={
+                    <Layout>
+                        <EmployerLayout><ProtectedRoute allowedRoles={['employer']}>
+                            <EmployerPostJob />
+                        </ProtectedRoute></EmployerLayout>
+
+                    </Layout>
+                }
+            />
+            <Route
+                path="/employer/applications"
+                element={
+                    <Layout>
+                        <EmployerLayout> <ProtectedRoute allowedRoles={['employer']}>
+                            <EmployerApplications />
+                        </ProtectedRoute></EmployerLayout>
+
+                    </Layout>
+                }
+            />
+            <Route
+                path="/employer/profile"
+                element={
+                    <Layout>
+                        <ProtectedRoute allowedRoles={['employer']}>
+                            <EmployerProfile />
+                        </ProtectedRoute>
+                    </Layout>
+                }
+            />
+
+            <Route
+                path="/admin/dashboard"
+                element={
+                    <Layout>
+                        <AdminLayout>
+                            <AdminDashboard />
+                        </AdminLayout>
+                    </Layout>
+                }
+            />
+            <Route
+                path="/admin/users"
+                element={
+                    <Layout>
+                        <AdminLayout>
+                            <AdminUsers />
+                        </AdminLayout>
+                    </Layout>
+                }
+            />
+            <Route
+                path="/admin/jobs"
+                element={
+                    <Layout>
+                        <AdminLayout>
+                            <AdminJobs />
+                        </AdminLayout>
+                    </Layout>
+                }
+            />
+
+            {/* Catch-all route */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
     );
 }
 
-export default App; 
+export default App;
