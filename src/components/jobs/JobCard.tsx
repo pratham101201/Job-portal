@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, Briefcase, DollarSign, Clock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../ui/Card';
 import { Job } from '../../lib/types';
-import { formatCurrency, capitalizeFirstLetter, getRelativeTimeString } from '../../lib/utils';
+import { capitalizeFirstLetter, getRelativeTimeString } from '../../lib/utils';
 
 interface JobCardProps {
   job: Job;
@@ -43,7 +43,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, featured = false }) => {
               <div className="flex items-center">
                 <DollarSign className="w-4 h-4 mr-1" />
                 <span>
-                  {formatCurrency(job.salary)}
+                  {job.salary}
                 </span>
               </div>
             )}

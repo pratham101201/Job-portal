@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, } from 'react-router-dom';
 import { useAuthStore } from './lib/store';
 
 // Layout
@@ -7,8 +7,8 @@ import Layout from './components/layout/Layout';
 
 // Public pages
 import HomePage from './pages/HomePage';
-import  LoginPage  from './pages/auth/LoginPage';
-import RegisterPage  from './pages/auth/RegisterPage';
+import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
 import JobsPage from './pages/jobs/JobsPage';
 import JobDetailPage from './pages/jobs/JobDetailPage';
 

@@ -88,13 +88,29 @@ export const getStatusColor = (status: string): string => {
 };
 
 export const fetchApplications = async (token: string) => {
-  const response = await fetch('lucky-determination-production.up.railway.app/api/applications', {
+  const response = await fetch('https://lucky-determination-production.up.railway.app/api/applications', {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  const result = await response.json();
-  console.log(result);
-  if (!response.ok) throw new Error(result.message || 'Failed to fetch applications');
-  return result;
+
+  const contentType = response.headers.get('content-type');
+  if (!response.ok) {
+    // Try to get error message from JSON, fallback to text
+    let errorMsg = 'Failed to fetch applications';
+    if (contentType && contentType.includes('application/json')) {
+      const result = await response.json();
+      errorMsg = result.message || errorMsg;
+    } else {
+      const text = await response.text();
+      errorMsg = text;
+    }
+    throw new Error(errorMsg);
+  }
+
+  if (contentType && contentType.includes('application/json')) {
+    return await response.json();
+  } else {
+    throw new Error('Invalid response format: expected JSON');
+  }
 };

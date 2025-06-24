@@ -19,20 +19,23 @@ const EmployerDashboard: React.FC = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const jobs = await jobsRes.json();
+        console.log('Jobs response:', jobs);
         // Filter jobs by employerId
         const employerJobs = Array.isArray(jobs)
           ? jobs.filter((job: any) => job.employerId === user?.id && job.isActive)
           : [];
+        console.log('Employer jobs:', employerJobs);
         setJobCount(employerJobs.length);
 
         // Fetch applications for employer's jobs
         let allApplications: any[] = [];
         for (const job of employerJobs) {
           const appsRes = await fetch(
-            `http://localhost:5000/api/applications?jobId=${job.id}`,
+            `https://lucky-determination-production.up.railway.app/api/applications?jobId=${job.id}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           const apps = await appsRes.json();
+          console.log(`Applications for job ${job.id}:`, apps);
           if (Array.isArray(apps)) {
             allApplications = allApplications.concat(apps);
           }

@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { Filter, SlidersHorizontal, ArrowUpDown } from 'lucide-react';
 import { getJobs } from '../../lib/firebase';
 import { useJobsStore } from '../../lib/store';
-import { Job } from '../../lib/types';
 import JobCard from '../../components/jobs/JobCard';
 import JobSearch, { JobSearchFilters } from '../../components/jobs/JobSearch';
 import Button from '../../components/ui/Button';
@@ -11,7 +10,7 @@ import { jobCategories, jobTypes } from '../../lib/utils';
 
 
 const JobsPage: React.FC = () => {
- 
+
   const location = useLocation();
   const { jobs, isLoading, error, setJobs, setIsLoading, setError } = useJobsStore();
   const [showFilters, setShowFilters] = useState(false);
@@ -19,7 +18,7 @@ const JobsPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedType, setSelectedType] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('newest');
-  
+
   // Parse URL query parameters on initial load
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -28,30 +27,30 @@ const JobsPage: React.FC = () => {
       location: searchParams.get('location') || undefined,
       category: searchParams.get('category') || undefined
     };
-    
+
     setFilters(initialFilters);
     if (initialFilters.category) {
       setSelectedCategory(initialFilters.category);
     }
-    
+
   }, [location.search]);
-  
+
   // Fetch jobs with filters
   useEffect(() => {
     const fetchJobs = async () => {
       try {
         setIsLoading(true);
-        
+
         // In a real app, you'd pass the filters to the getJobs function
         const fetchedJobs = await getJobs(filters);
-        
+
         // Apply client-side filtering for the type (as an example)
         let filteredJobs = [...fetchedJobs];
-        
+
         if (selectedType) {
           filteredJobs = filteredJobs.filter(job => job.type === selectedType);
         }
-        
+
         // Apply sorting
         switch (sortBy) {
           case 'newest':
@@ -66,7 +65,7 @@ const JobsPage: React.FC = () => {
           default:
             break;
         }
-        
+
         setJobs(filteredJobs);
       } catch (error: any) {
         console.error('Error fetching jobs:', error);
@@ -75,19 +74,19 @@ const JobsPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchJobs();
   }, [filters, selectedType, sortBy, setJobs, setIsLoading, setError]);
 
   const handleSearch = (searchFilters: JobSearchFilters) => {
     setFilters({ ...filters, ...searchFilters });
-    
+
     // Update URL with search parameters
     const searchParams = new URLSearchParams();
     if (searchFilters.keyword) searchParams.set('keyword', searchFilters.keyword);
     if (searchFilters.location) searchParams.set('location', searchFilters.location);
     if (searchFilters.category) searchParams.set('category', searchFilters.category);
-    
+
     window.history.pushState({}, '', `${location.pathname}?${searchParams.toString()}`);
   };
 
@@ -103,7 +102,7 @@ const JobsPage: React.FC = () => {
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSortBy(e.target.value);
   };
-  
+
   const clearAllFilters = () => {
     setSelectedCategory('');
     setSelectedType('');
@@ -116,11 +115,11 @@ const JobsPage: React.FC = () => {
     <div className="py-8">
       <div className="container">
         <h1 className="text-3xl font-bold text-neutral-800 mb-8">Find Your Perfect Job</h1>
-        
+
         <div className="mb-8">
           <JobSearch onSearch={handleSearch} />
         </div>
-        
+
         <div className="flex flex-col md:flex-row gap-8">
           {/* Filters sidebar - Desktop */}
           <div className="hidden md:block w-64 shrink-0">
@@ -129,20 +128,20 @@ const JobsPage: React.FC = () => {
                 <h3 className="font-medium text-lg flex items-center">
                   <Filter className="w-4 h-4 mr-2" /> Filters
                 </h3>
-                <button 
+                <button
                   className="text-xs text-primary hover:text-primary-dark"
                   onClick={clearAllFilters}
                 >
                   Clear all
                 </button>
               </div>
-              
+
               <div className="space-y-6">
                 <div>
                   <label className="text-sm font-medium text-neutral-700 mb-2 block">
                     Job Category
                   </label>
-                  <select 
+                  <select
                     className="input"
                     value={selectedCategory}
                     onChange={handleCategoryChange}
@@ -155,12 +154,12 @@ const JobsPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium text-neutral-700 mb-2 block">
                     Job Type
                   </label>
-                  <select 
+                  <select
                     className="input"
                     value={selectedType}
                     onChange={handleTypeChange}
@@ -173,12 +172,12 @@ const JobsPage: React.FC = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium text-neutral-700 mb-2 block">
                     Sort By
                   </label>
-                  <select 
+                  <select
                     className="input"
                     value={sortBy}
                     onChange={handleSortChange}
@@ -191,13 +190,13 @@ const JobsPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Jobs list */}
           <div className="flex-1">
             {/* Mobile filters toggle */}
             <div className="md:hidden mb-4 flex items-center justify-between">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 className="flex items-center"
                 onClick={() => setShowFilters(!showFilters)}
@@ -205,10 +204,10 @@ const JobsPage: React.FC = () => {
                 <SlidersHorizontal className="w-4 h-4 mr-2" />
                 {showFilters ? 'Hide Filters' : 'Show Filters'}
               </Button>
-              
+
               <div className="flex items-center">
                 <ArrowUpDown className="w-4 h-4 mr-2 text-neutral-500" />
-                <select 
+                <select
                   className="text-sm border-none bg-transparent"
                   value={sortBy}
                   onChange={handleSortChange}
@@ -219,7 +218,7 @@ const JobsPage: React.FC = () => {
                 </select>
               </div>
             </div>
-            
+
             {/* Mobile filters */}
             {showFilters && (
               <div className="md:hidden bg-white rounded-lg shadow-sm border border-neutral-200 p-4 mb-4 animate-slide-up">
@@ -228,7 +227,7 @@ const JobsPage: React.FC = () => {
                     <label className="text-sm font-medium text-neutral-700 mb-2 block">
                       Job Category
                     </label>
-                    <select 
+                    <select
                       className="input"
                       value={selectedCategory}
                       onChange={handleCategoryChange}
@@ -241,12 +240,12 @@ const JobsPage: React.FC = () => {
                       ))}
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="text-sm font-medium text-neutral-700 mb-2 block">
                       Job Type
                     </label>
-                    <select 
+                    <select
                       className="input"
                       value={selectedType}
                       onChange={handleTypeChange}
@@ -259,16 +258,16 @@ const JobsPage: React.FC = () => {
                       ))}
                     </select>
                   </div>
-                  
+
                   <div className="flex justify-between">
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={clearAllFilters}
                     >
                       Clear all
                     </Button>
-                    <Button 
+                    <Button
                       size="sm"
                       onClick={() => setShowFilters(false)}
                     >
@@ -278,7 +277,7 @@ const JobsPage: React.FC = () => {
                 </div>
               </div>
             )}
-            
+
             {/* Jobs results */}
             <div className="mb-4 text-neutral-600">
               {isLoading ? (
@@ -287,13 +286,13 @@ const JobsPage: React.FC = () => {
                 <p>{jobs.length} jobs found</p>
               )}
             </div>
-            
+
             {error && (
               <div className="bg-error/10 border border-error/20 text-error p-4 rounded-md mb-4">
                 {error}
               </div>
             )}
-            
+
             {isLoading ? (
               <div className="space-y-4">
                 {[1, 2, 3].map(i => (

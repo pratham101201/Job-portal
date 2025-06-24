@@ -294,4 +294,27 @@ export const getAllUsers = async (role?: string, limitCount?: number) => {
   }
 };
 
+export const updateEmployerProfile = async (userId: string, profile: {
+  companyName: string;
+  companyDescription: string;
+  industry: string;
+  location: string;
+  website: string;
+}) => {
+  try {
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      companyName: profile.companyName,
+      companyDescription: profile.companyDescription,
+      industry: profile.industry,
+      location: profile.location,
+      website: profile.website,
+      updatedAt: Date.now(),
+    });
+    return true;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export { auth, db, onAuthStateChanged };
